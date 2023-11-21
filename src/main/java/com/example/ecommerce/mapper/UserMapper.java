@@ -1,7 +1,7 @@
 package com.example.ecommerce.mapper;
 
-import com.example.ecommerce.domain.Review;
-import com.example.ecommerce.domain.User;
+import com.example.ecommerce.entity.Review;
+import com.example.ecommerce.entity.User;
 import com.example.ecommerce.dto.RegistrationRequestDto;
 import com.example.ecommerce.dto.perfume.PerfumeResponseDto;
 import com.example.ecommerce.dto.review.ReviewRequestDto;

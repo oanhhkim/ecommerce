@@ -1,8 +1,8 @@
 package com.example.ecommerce.entity;
 
+import jakarta.persistence.*;
 import lombok.Data;
 
-import javax.persistence.*;
 import java.util.Set;
 
 @Data
@@ -26,8 +26,8 @@ public class User {
     private String passwordResetCode;
     private boolean active;
 
-    @Enumerated(EnumType.STRING)
-    private AuthProvider provider;
+//    @Enumerated(EnumType.STRING)
+//    private AuthProvider provider;
 
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
