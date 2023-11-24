@@ -63,4 +63,47 @@ public class OrderServiceImpl implements OrderService {
         orderRepository.delete(order);
         return orderRepository.findAllByOrderByIdAsc();
     }
+
+    @Override
+    @Transactional
+    public Order postOrder(Order validOrder, Map<Long, Long> perfumesId) {
+        Order order = new Order();
+        List<OrderItem> orderItemList = new ArrayList<>();
+
+        for (Map.Entry<Long, Long> entry : perfumesId.entrySet()) {
+            Perfume perfume = perfumeRepository.findById(entry.getKey()).get();
+            OrderItem orderItem = new OrderItem();
+            orderItem.setPerfume(perfume);
+            orderItem.setAmount((perfume.getPrice() * entry.getValue()));
+            orderItem.setQuantity(entry.getValue());
+            orderItemList.add(orderItem);
+            orderItemRepository.save(orderItem);
+        }
+        order.getOrderItems().addAll(orderItemList);
+        order.setTotalPrice(validOrder.getTotalPrice());
+        order.setFirstName(validOrder.getFirstName());
+        order.setLastName(validOrder.getLastName());
+        order.setCity(validOrder.getCity());
+        order.setAddress(validOrder.getAddress());
+        order.setPostIndex(validOrder.getPostIndex());
+        order.setEmail(validOrder.getEmail());
+        order.setPhoneNumber(validOrder.getPhoneNumber());
+        orderRepository.save(order);
+
+        String subject = "Order #" + order.getId();
+        String template = "order-template";
+        Map<String, Object> attributes = new HashMap<>();
+        attributes.put("order", order);
+        mailSender.sendMessageHtml(order.getEmail(), subject, template, attributes);
+        return order;
+    }
+
+    @Override
+    @Transactional
+    public List<Order> deleteOrder(Long orderId) {
+        Order order = orderRepository.findById(orderId).get();
+        order.getOrderItems().forEach(orderItem -> orderItemRepository.deleteById(orderItem.getId()));
+        orderRepository.delete(order);
+        return orderRepository.findAllByOrderByIdAsc();
+    }
 }

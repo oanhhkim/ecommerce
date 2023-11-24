@@ -4,7 +4,10 @@ import com.example.ecommerce.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class UserServiceImpl {
 
@@ -31,5 +34,30 @@ public class UserServiceImpl {
     @Override
     public List<User> findAllUsers() {
         return userRepository.findAllByOrderByIdAsc();
+    }
+
+    @Override
+    public boolean sendPasswordResetCode(String email) {
+        User user = userRepository.findByEmail(email);
+        if (user == null) return false;
+        user.setPasswordResetCode(UUID.randomUUID().toString());
+        userRepository.save(user);
+
+        String subject = "Password reset";
+        String template = "password-reset-template";
+        Map<String, Object> attributes = new HashMap<>();
+        attributes.put("firstName", user.getFirstName());
+        attributes.put("resetUrl", "http://" + hostname + "/reset/" + user.getPasswordResetCode());
+        mailSender.sendMessageHtml(user.getEmail(), subject, template, attributes);
+        return true;
+    }
+
+    @Override
+    public String passwordReset(String email, String password) {
+        User user = userRepository.findByEmail(email);
+        user.setPassword(passwordEncoder.encode(password));
+        user.setPasswordResetCode(null);
+        userRepository.save(user);
+        return "Password successfully changed!";
     }
 }
