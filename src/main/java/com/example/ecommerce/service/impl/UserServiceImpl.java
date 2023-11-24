@@ -37,6 +37,38 @@ public class UserServiceImpl {
     }
 
     @Override
+    public String passwordReset(String email, String password) {
+        User user = userRepository.findByEmail(email);
+        user.setPassword(passwordEncoder.encode(password));
+        user.setPasswordResetCode(null);
+        userRepository.save(user);
+        return "Password successfully changed!";
+    }
+
+    @Override
+    public boolean activateUser(String code) {
+        User user = userRepository.findByActivationCode(code);
+        if (user == null) return false;
+        user.setActivationCode(null);
+        user.setActive(true);
+        userRepository.save(user);
+        return true;
+    }
+
+    @Override
+    public User updateProfile(String email, User user) {
+        User userFromDb = userRepository.findByEmail(email);
+        userFromDb.setFirstName(user.getFirstName());
+        userFromDb.setLastName(user.getLastName());
+        userFromDb.setCity(user.getCity());
+        userFromDb.setAddress(user.getAddress());
+        userFromDb.setPhoneNumber(user.getPhoneNumber());
+        userFromDb.setPostIndex(user.getPostIndex());
+        userRepository.save(userFromDb);
+        return userFromDb;
+    }
+
+    @Override
     public boolean sendPasswordResetCode(String email) {
         User user = userRepository.findByEmail(email);
         if (user == null) return false;
@@ -60,4 +92,5 @@ public class UserServiceImpl {
         userRepository.save(user);
         return "Password successfully changed!";
     }
+
 }
