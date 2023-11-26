@@ -36,20 +36,6 @@ public class ProductServiceImpl implements ProductService{
 		return productRepository.save(Product);
 	}
 
-	@Override
-	public Product editProduct(Product Product, Long id) {
-		Product productInDB = productRepository.findById(id).get();
-		Category category = categoryRepository.findById(Product.getCategory().getId()).get();
-		
-		productInDB.setCategory(category);
-		productInDB.setDescription(Product.getDescription());
-		productInDB.setName(Product.getName());
-		productInDB.setPicture(Product.getPicture());
-		productInDB.setPrice(Product.getPrice());
-		productInDB.setQuantity(Product.getQuantity());
-		
-		return productRepository.save(productInDB);
-	}
 
 	@Override
 	public void deleteProduct(Product Product) {
